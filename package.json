@@ -28,6 +28,8 @@
     "node-cache": "^5.1.2",
     "node-fetch": "^3.3.2",
     "node-telegram-bot-api": "^0.66.0",
+    "mumaker": "latest",
+    "gtts": "latest",
     "node-webpmux": "^3.2.1",
     "node-youtube-music": "^0.10.3",
     "pino": "^9.5.0",
