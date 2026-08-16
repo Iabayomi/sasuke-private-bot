@@ -1,225 +1,113 @@
 const isAdmin = require('../lib/isAdmin');
 
-const KICK_IMAGES = {
-    success: 'https://image2url.com/r2/default/images/1771163990900-fbd08407-933a-431f-97da-a92e1492e835.jpg',
-    error: 'https://image2url.com/r2/default/images/1771163990900-fbd08407-933a-431f-97da-a92e1492e835.jpg',
-    bot: 'https://image2url.com/r2/default/images/1771163990900-fbd08407-933a-431f-97da-a92e1492e835.jpg',
-    admin: 'https://images.iimg.live/images/vibrant-gallery-4281.webp',
-    kick: 'https://image2url.com/r2/default/images/1771163990900-fbd08407-933a-431f-97da-a92e1492e835.jpg'
-};
-
-function speak(type, message) {
-    const responses = {
-        success: `✦ ${message} | The Shadow Realm cleanses itself.`,
-        error: `✗ ${message} | My power is limited.`,
-        warning: `⚠ ${message} | Tread carefully, subject.`,
-        info: `◈ ${message} | This Queen commands.`
-    };
-    return responses[type] || message;
-}
-
 async function kickCommand(sock, chatId, senderId, mentionedJids, message) {
-    try {
-        // Validate message object - FIXES fromMe ERROR
-        if (!message || !message.key) {
-            console.error('Kick error: Invalid message object');
-            return;
-        }
-
-        // Get admin status
+    // Check if user is owner
+    const isOwner = message.key.fromMe;
+    if (!isOwner) {
         const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
-        const isDev = senderId.replace(/[^0-9]/g, '') === '237659262653';
-        const isOwner = message.key.fromMe || isDev;
 
-        // Check bot admin
         if (!isBotAdmin) {
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.error },
-                caption: speak('error', 'I require admin privileges to banish subjects.'),
-                contextInfo: {
-                    externalAdReply: {
-                        title: "⛔ Bot Not Admin",
-                        body: "Promote me to use kick",
-                        thumbnailUrl: KICK_IMAGES.error
-                    }
-                }
-            }, { quoted: message });
+            await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' }, { quoted: message });
             return;
         }
 
-        // Check sender privileges (owner bypasses admin check)
-        if (!isOwner && !isSenderAdmin) {
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.admin },
-                caption: speak('warning', 'Only the Shadow Council may banish subjects.'),
-                contextInfo: {
-                    externalAdReply: {
-                        title: "⛔ Access Denied",
-                        body: "Admin privileges required",
-                        thumbnailUrl: KICK_IMAGES.admin
-                    }
-                }
-            }, { quoted: message });
+        if (!isSenderAdmin) {
+            await sock.sendMessage(chatId, { text: 'Only group admins can use the kick command.' }, { quoted: message });
             return;
         }
+    }
 
-        // Find users to kick
-        let usersToKick = [];
+    let usersToKick = [];
+    
+    // Check for mentioned users
+    if (mentionedJids && mentionedJids.length > 0) {
+        usersToKick = mentionedJids;
+    }
+    // Check for replied message
+    else if (message.message?.extendedTextMessage?.contextInfo?.participant) {
+        usersToKick = [message.message.extendedTextMessage.contextInfo.participant];
+    }
+    
+    // If no user found through either method
+    if (usersToKick.length === 0) {
+        await sock.sendMessage(chatId, { 
+            text: 'Please mention the user or reply to their message to kick!'
+        }, { quoted: message });
+        return;
+    }
+
+    // Get bot's ID in multiple formats for comparison
+    const botId = sock.user.id; // Full bot ID: 16305199236:6@s.whatsapp.net
+    const botPhoneNumber = sock.user.id.split(':')[0]; // 16305199236
+    const botIdFormatted = botPhoneNumber + '@s.whatsapp.net'; // 16305199236@s.whatsapp.net
+
+    // Get group participants to check against actual participant data
+    const metadata = await sock.groupMetadata(chatId);
+    const participants = metadata.participants || [];
+
+    // Check if any of the users to kick is the bot itself
+    const isTryingToKickBot = usersToKick.some(userId => {
+        const userPhoneNumber = userId.split('@')[0];
         
-        // Method 1: Mentioned users
-        if (mentionedJids && mentionedJids.length > 0) {
-            usersToKick = mentionedJids;
-        }
-        // Method 2: Replied message
-        else if (message.message?.extendedTextMessage?.contextInfo?.participant) {
-            usersToKick = [message.message.extendedTextMessage.contextInfo.participant];
-        }
+        // Check direct ID matches
+        const directMatch = (
+            userId === botId || // Direct ID match
+            userId === botIdFormatted || // Formatted ID match
+            userPhoneNumber === botPhoneNumber // Phone number match
+        );
         
-        // No user found
-        if (usersToKick.length === 0) {
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.error },
-                caption: speak('warning', 'Mention a subject or reply to their message to banish them.'),
-                contextInfo: {
-                    externalAdReply: {
-                        title: "❌ No Target",
-                        body: "Specify who to kick",
-                        thumbnailUrl: KICK_IMAGES.error
-                    }
-                }
-            }, { quoted: message });
-            return;
-        }
-
-        // Get group metadata for checks
-        const metadata = await sock.groupMetadata(chatId);
-        const participants = metadata.participants || [];
-        const botId = sock.user.id;
-        const botNumber = botId.split(':')[0];
-
-        // Filter valid targets
-        const validTargets = [];
-        const protectedUsers = [];
+        // Check against participant data to find the bot
+        const participantMatch = participants.some(p => {
+            const pPhoneNumber = p.phoneNumber ? p.phoneNumber.split('@')[0] : '';
+            const pId = p.id ? p.id.split('@')[0] : '';
+            
+            // Check if this participant is the bot
+            const isThisParticipantBot = (
+                pPhoneNumber === botPhoneNumber || // Phone number match
+                pId === botPhoneNumber || // ID portion match
+                p.id === botId || // Direct ID match
+                p.phoneNumber === botIdFormatted // Phone number format match
+            );
+            
+            // If this participant is the bot, check if we're trying to kick them
+            if (isThisParticipantBot) {
+                return (
+                    userId === p.id || // Direct participant ID match
+                    userPhoneNumber === pPhoneNumber || // Phone number match
+                    userPhoneNumber === pId || // ID portion match
+                    userId === p.phoneNumber // Direct phone number match
+                );
+            }
+            return false;
+        });
         
-        for (const userId of usersToKick) {
-            const userNumber = userId.split('@')[0];
-            
-            // Check if trying to kick bot
-            if (userNumber === botNumber || userId === botId) {
-                protectedUsers.push({ id: userId, reason: 'bot' });
-                continue;
-            }
-            
-            // Check if trying to kick owner (you)
-            if (userNumber === '237659262653') {
-                protectedUsers.push({ id: userId, reason: 'owner' });
-                continue;
-            }
-            
-            // Check if target is admin (only owner can kick admins)
-            const targetParticipant = participants.find(p => {
-                const pNum = p.id.split('@')[0];
-                return pNum === userNumber;
-            });
-            
-            if (targetParticipant?.admin && !isOwner) {
-                protectedUsers.push({ id: userId, reason: 'admin' });
-                continue;
-            }
-            
-            validTargets.push(userId);
-        }
+        return directMatch || participantMatch;
+    });
 
-        // Report protected users
-        if (protectedUsers.length > 0) {
-            const reasons = protectedUsers.map(u => {
-                if (u.reason === 'bot') return '• Myself (I cannot self-destruct)';
-                if (u.reason === 'owner') return '• The Shadow Monarch (unthinkable)';
-                if (u.reason === 'admin') return '• A fellow council member (owner only)';
-                return '• Protected entity';
-            }).join('\n');
-            
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.bot },
-                caption: speak('warning', `Some subjects are protected:\\n${reasons}`),
-                contextInfo: {
-                    externalAdReply: {
-                        title: "🛡️ Protected",
-                        body: "Cannot kick protected users",
-                        thumbnailUrl: KICK_IMAGES.bot
-                    }
-                }
-            }, { quoted: message });
-        }
+    if (isTryingToKickBot) {
+        await sock.sendMessage(chatId, { 
+            text: "I can't kick myself🤖"
+        }, { quoted: message });
+        return;
+    }
 
-        // Execute kick for valid targets
-        if (validTargets.length === 0) return;
-
-        try {
-            await sock.groupParticipantsUpdate(chatId, validTargets, "remove");
-            
-            const kickedNames = validTargets.map(jid => `@${jid.split('@')[0]}`);
-            const kickText = validTargets.length === 1 
-                ? speak('success', `${kickedNames[0]} has been banished from the Shadow Realm.`)
-                : speak('success', `${kickedNames.length} subjects have been banished:\\n${kickedNames.join('\\n')}`);
-
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.kick },
-                caption: kickText,
-                mentions: validTargets,
-                contextInfo: {
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363421176303484@newsletter',
-                        newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
-                        serverMessageId: -1
-                    },
-                    externalAdReply: {
-                        title: "👑 Subject Banished",
-                        body: `${validTargets.length} removed from group`,
-                        thumbnailUrl: KICK_IMAGES.success,
-                        mediaType: 1,
-                        renderLargerThumbnail: true,
-                        sourceUrl: "https://wa.me/237659262653"
-                    }
-                }
-            }, { quoted: message });
-
-        } catch (error) {
-            console.error('Kick execution error:', error);
-            await sock.sendMessage(chatId, {
-                image: { url: KICK_IMAGES.error },
-                caption: speak('error', 'The banishment ritual failed. The shadows resisted.'),
-                contextInfo: {
-                    externalAdReply: {
-                        title: "❌ Kick Failed",
-                        body: "Error removing user",
-                        thumbnailUrl: KICK_IMAGES.error
-                    }
-                }
-            }, { quoted: message });
-        }
-
+    try {
+        await sock.groupParticipantsUpdate(chatId, usersToKick, "remove");
+        
+        // Get usernames for each kicked user
+        const usernames = await Promise.all(usersToKick.map(async jid => {
+            return `@${jid.split('@')[0]}`;
+        }));
+        
+        await sock.sendMessage(chatId, { 
+            text: `${usernames.join(', ')} has been kicked successfully!`,
+            mentions: usersToKick
+        });
     } catch (error) {
-        console.error('Kick command error:', error);
-        try {
-            if (message && message.key) {
-                await sock.sendMessage(chatId, {
-                    image: { url: KICK_IMAGES.error },
-                    caption: speak('error', 'An unexpected shadow consumed the command.'),
-                    contextInfo: {
-                        externalAdReply: {
-                            title: "⚠️ Error",
-                            body: "Command failed",
-                            thumbnailUrl: KICK_IMAGES.error
-                        }
-                    }
-                }, { quoted: message });
-            }
-        } catch (e) {
-            console.error('Failed to send error message:', e);
-        }
+        console.error('Error in kick command:', error);
+        await sock.sendMessage(chatId, { 
+            text: 'Failed to kick user(s)!'
+        });
     }
 }
 

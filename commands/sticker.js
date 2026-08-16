@@ -37,7 +37,7 @@ async function stickerCommand(sock, chatId, message) {
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363161513685998@newsletter',
-                    newsletterName: '༆◄─♡ᬼ⃟♡༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆',
+                    newsletterName: 'Sasuke Private Bot',
                     serverMessageId: -1
                 }
             }

@@ -2,10 +2,10 @@ const fetch = require('node-fetch');
 
 // --- Images par défaut si la photo de profil n'existe pas ---
 const GOODBYE_IMAGES = [
-    'https://images.iimg.live/images/supreme-gallery-2850.webp',
-    'https://images.iimg.live/images/wonderful-creation-1886.webp',
-    'https://image2url.com/r2/default/images/1771163908060-c08212b5-11de-451f-a2f3-e6297e5f7eb6.png',
-    'https://images.iimg.live/images/vibrant-gallery-4281.webp
+    'https://images.iimg.live/images/spectacular-vision-3440.webp',
+    'https://images.iimg.live/images/awesome-snapshot-4114.webp',
+    'https://image2url.com/r2/default/images/1769790459827-cbdc81c4-965e-4195-ac69-e9568ca40419.jpg',
+    'https://image2url.com/r2/default/images/1769790494460-0a43b070-35bc-41aa-a2b6-bc78e66c99b8.jpg'
 ];
 
 // --- Statut Goodbye activé pour les groupes ---
@@ -63,7 +63,11 @@ async function handleLeaveEvent(sock, chatId, participants) {
 ┃ Time      : ${time}
 ┃ Date      : ${date}
 ╚═━━─────────────━━━═╝
-© *Black~King*
+
+╭━〔 👑 POWERED BY 〕━╮
+┃  🜲 BLACK KING NEMESIS
+┃  ⚜ The Nemesis Prime
+╰━━━━━━━━━━━━━━━━━╯
 `;
 
             await sock.sendMessage(chatId, {
@@ -76,7 +80,7 @@ async function handleLeaveEvent(sock, chatId, participants) {
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
                         newsletterJid: newsletterJid,
-                        newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
+                        newsletterName: 'Sasuke Private Bot',
                         serverMessageId: Math.floor(Math.random() * 1000)
                     },
                     externalAdReply: {
@@ -85,7 +89,7 @@ async function handleLeaveEvent(sock, chatId, participants) {
                         thumbnailUrl: userPic,
                         mediaType: 1,
                         renderLargerThumbnail: true,
-                        sourceUrl: "https://whatsapp.com/channel/0029VbBYMyZIyPtOEnuT0S04"
+                        sourceUrl: "https://whatsapp.com/channel/0029Vb8zve99sBI37uVER11q"
                     }
                 }
             });

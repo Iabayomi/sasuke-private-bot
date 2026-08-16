@@ -1,18 +1,19 @@
-const { newsletterContext, getRandomNewsletterImage } = require('../lib/messageConfig');
+// ==================== commands/repo.js ====================
 
 const scriptLink = "https://github.com/queen-ai-bot-md/queen_ai_md";
-const channelLink = "https://whatsapp.com/channel/0029VbBYMyZIyPtOEnuT0S04";
+const channelLink = "https://whatsapp.com/channel/0029Vb8zve99sBI37uVER11q";
 const devChannel2 = "https://whatsapp.com/channel/0029VapNnkE60eBaAvllKJ2g";
 const groupLink = "https://chat.whatsapp.com/DpADtS77s3LKToWpjDQnz1";
 const telegramGroupLink = "https://t.me/bugbotsapp";
+const videoMenuUrl = "https://image2url.com/r2/default/videos/1769892528235-7b251060-9471-45fb-8d30-a9006bc8f68a.mp4";
 
 async function repoCommand(sock, chatId, message) {
     try {
         const text = `
 ╭━〔 ~*QUEEN AI SYSTEM*~ 〕━⬣
-┃ © Developer: *BLACK~KING*
+┃ 🧠 Developer: *BLACK~~KING*
 ┃
-┣━━〔 📜 SCRIPT v2 〕━⬣
+┣━━〔 📜 SCRIPT 〕━⬣
 ┃ 🔗 ${scriptLink}
 ┃
 ┣━━〔 📡 CHANNELS 〕━⬣
@@ -23,21 +24,16 @@ async function repoCommand(sock, chatId, message) {
 ┃ 🏠 WhatsApp: ${groupLink}
 ┃ 📱 Telegram: ${telegramGroupLink}
 ┃
-┣━━〔 🎬 free bot tg v2 〕━⬣
-┃ ▶ https://t.me/queen_ai_v2_bot
-┃ ▶ https://t.me/queen_ai_v2_n2_bot
-┃ ▶ https://t.me/queen_ai_v2_n3_bot
-┣━━〔 🎬 free bot tg v3 〕━⬣
-┃ ▶ http://t.me/queen_ai_v3_bot
-┃ ▶ http://t.me/queen_ai_v3_n2_bot
-╰━━〔 ⚜ *NEMESIS TECH* ⚜ 〕━⬣
+┣━━〔 🎬 MEDIA 〕━⬣
+┃ ▶ YouTube: Coming Soon
+┃
+╰━━〔 ⚜NEMESIS TECH⚜ 〕━⬣
 `;
 
-        const randomImage = getRandomNewsletterImage();
         await sock.sendMessage(chatId, {
-            image: { url: randomImage },
+            video: { url: videoMenuUrl },
             caption: text,
-            contextInfo: newsletterContext(randomImage)
+            gifPlayback: true // vidéo en boucle comme un GIF
         }, { quoted: message });
 
     } catch (err) {

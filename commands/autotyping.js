@@ -29,7 +29,7 @@ async function autotypingCommand(sock, chatId, message) {
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
                         newsletterJid: '120363421176303484@newsletter',
-                        newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻ ',
+                        newsletterName: 'Sasuke Private Bot ',
                         serverMessageId: -1
                     }
                 }
@@ -60,7 +60,7 @@ async function autotypingCommand(sock, chatId, message) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: '120363421176303484@newsletter',
-                            newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
+                            newsletterName: 'Sasuke Private Bot',
                             serverMessageId: -1
                         }
                     }
@@ -83,7 +83,7 @@ async function autotypingCommand(sock, chatId, message) {
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363421176303484@newsletter',
-                    newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
+                    newsletterName: 'Sasuke Private Bot',
                     serverMessageId: -1
                 }
             }
@@ -98,7 +98,7 @@ async function autotypingCommand(sock, chatId, message) {
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363421176303484@newsletter',
-                    newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
+                    newsletterName: 'Sasuke Private Bot',
                     serverMessageId: -1
                 }
             }

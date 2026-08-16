@@ -8,9 +8,10 @@ let globalWelcome = false;
 
 // Images personnalisées fournies par toi
 const customImages = [
-  'https://images.iimg.live/images/wonderful-creation-1886.webp',
-  'https://images.iimg.live/images/vibrant-gallery-4281.webp',
-  'https://images.iimg.live/images/vibrant-gallery-4281.webp'
+  'https://images.iimg.live/images/spectacular-vision-3440.webp',
+  'https://images.iimg.live/images/awesome-snapshot-4114.webp',
+  'https://image2url.com/r2/default/images/1769790459827-cbdc81c4-965e-4195-ac69-e9568ca40419.jpg',
+  'https://image2url.com/r2/default/images/1769790494460-0a43b070-35bc-41aa-a2b6-bc78e66c99b8.jpg'
 ];
 
 // --- Charger l'état au démarrage ---
@@ -44,17 +45,21 @@ function generateWelcomeMenu(displayName, groupName, groupSize, groupDesc) {
   const dateStr = now.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' });
 
   return `
-╔═〔 ❀ *QuEeN Ai WELCOME* ✿ 〕═╗
-┃       𝑽𝒆𝒓𝒔𝒊𝒐𝒏 • 3.0.6 ⚙️
+╔═〔 ❀ 𝑸𝑼𝑬𝑬𝑵 𝑨𝑰 WELCOME ✿ 〕═╗
+┃       𝑽𝒆𝒓𝒔𝒊𝒐𝒏 • 2.0.0 ⚙️
 ╚═━━───────────━━━═╝
 
-╭━〔 📡 *GENERAL INFO* 〕━╮
+╭━〔 📡 GENERAL INFO 〕━╮
 ┃ 👤 User        : @${displayName}
 ┃ 🏰 Group       : ${groupName}
-┃ 👥 Members   : ${groupSize}
+┃ 👥 Members     : ${groupSize}
 ┃ 📜 Desc        : ${groupDesc}
 ╰━━━━━━━━━━━━━━━━━━━╯
-© *Black~~King*
+
+╭━〔 👑 POWERED BY 〕━╮
+┃  🜲 BLACK KING NEMESIS
+┃  ⚜ The Nemesis Prime
+╰━━━━━━━━━━━━━━━━━━╯
 `;
 }
 
@@ -64,16 +69,16 @@ const newsletterContext = (imageUrl) => ({
   isForwarded: true,
   forwardedNewsletterMessageInfo: {
     newsletterJid: '120363421176303484@newsletter',
-    newsletterName: '༺✿ ǫᴜᴇᴇɴ ᴀɪ ✿༻',
+    newsletterName: '༺✿ ǫᴜᴇᴇɴ ᴀɪ OFFICIAL CHANNEL ✿༻',
     serverMessageId: Math.floor(Math.random() * 1000)
   },
   externalAdReply: {
-    title: "༺✿ ǫᴜᴇᴇɴ ᴀɪ ✿༻",
-    body: "I am The best QuEeN",
+    title: "༺✿ ǫᴜᴇᴇɴ ᴀɪ SYSTEM ✿༻",
+    body: "Tap to view our official channel",
     thumbnailUrl: imageUrl,
     mediaType: 1,
     renderLargerThumbnail: true,
-    sourceUrl: "https://whatsapp.com/channel/0029VbBYMyZIyPtOEnuT0S04"
+    sourceUrl: "https://whatsapp.com/channel/0029Vb8zve99sBI37uVER11q"
   }
 });
 

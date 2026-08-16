@@ -8,7 +8,7 @@ const channelInfo = {
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421176303484@newsletter',
-            newsletterName: '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻',
+            newsletterName: 'Sasuke Private Bot',
             serverMessageId: -1
         }
     }
@@ -46,7 +46,7 @@ async function autoStatusCommand(sock, chatId, msg, args) {
             const status = config.enabled ? 'enabled' : 'disabled';
             const reactStatus = config.reactOn ? 'enabled' : 'disabled';
             await sock.sendMessage(chatId, { 
-                text: `༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻\n 🔄 *Auto Status Settings*\n\n📱 *Auto Status View:* ${status}\n💫 *Status Reactions:* ${reactStatus}\n\n*Commands:*\n.autostatus on - Enable auto status view\n.autostatus off - Disable auto status view\n.autostatus react on - Enable status reactions\n.autostatus react off - Disable status reactions`,
+                text: `Sasuke Private Bot\n 🔄 *Auto Status Settings*\n\n📱 *Auto Status View:* ${status}\n💫 *Status Reactions:* ${reactStatus}\n\n*Commands:*\n.autostatus on - Enable auto status view\n.autostatus off - Disable auto status view\n.autostatus react on - Enable status reactions\n.autostatus react off - Disable status reactions`,
                 ...channelInfo
             });
             return;

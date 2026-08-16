@@ -119,12 +119,12 @@ async function tiktokCommand(sock, chatId, message) {
                             await sock.sendMessage(chatId, {
                                 video: { url: mediaUrl },
                                 mimetype: "video/mp4",
-                                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༆◄─♡ᬼ⃟♡༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆"
+                                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Bot"
                             }, { quoted: message });
                         } else {
                             await sock.sendMessage(chatId, {
                                 image: { url: mediaUrl },
-                                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༆◄─♡ᬼ⃟♡༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆"
+                                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Bot"
                             }, { quoted: message });
                         }
                     }
@@ -146,7 +146,7 @@ async function tiktokCommand(sock, chatId, message) {
                     
                     const videoBuffer = Buffer.from(videoResponse.data);
                     
-                    const caption = title ? `𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻\n\n📝 Title: ${title}` : "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༆◄─♡ᬼ⃟♡༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆";
+                    const caption = title ? `𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Bot\n\n📝 Title: ${title}` : "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Bot";
                     
                     await sock.sendMessage(chatId, {
                         video: videoBuffer,
@@ -181,7 +181,7 @@ async function tiktokCommand(sock, chatId, message) {
                     console.error(`Failed to download video: ${downloadError.message}`);
                     // Fallback to URL method
                     try {
-                        const caption = title ? `𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆n\n📝 Title: ${title}` : "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 ༆◄─♡ᬼ⃟♡༆𝑸𝑼𝑬𝑬𝑵 𝑨𝒊༆♡ᬼ⃟♡─►༆";
+                        const caption = title ? `𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Botn\n📝 Title: ${title}` : "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 Sasuke Private Bot";
                         
                         await sock.sendMessage(chatId, {
                             video: { url: videoUrl },

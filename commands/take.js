@@ -14,7 +14,7 @@ async function takeCommand(sock, chatId, message, args) {
         }
 
         // Get the packname from args or use default
-        const packname = args.join(' ') || '༺『Q』『U』『E』『E』『N』 ❀『A』『i』༻ \n\n\n𝓑𝓵𝓪𝓬𝓴 𝓴𝓲𝓷𝓰 𝓵𝓮𝓸𝓷𝓲𝓭𝓪𝓼 (𝓣𝓱𝓮 𝓷𝓮𝓶𝓮𝓼𝓲𝓼 𝓹𝓻𝓲𝓶𝓮)';
+        const packname = args.join(' ') || 'Sasuke Private Bot \n\n\nIabayomi';
 
         try {
             // Download the sticker
