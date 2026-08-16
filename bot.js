@@ -6,13 +6,14 @@ const bot = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true });
 
 console.log('🤖 Sasuke Private Bot Telegram wrapper started...');
 
+bot.on('polling_error', (error) => {
+  console.error('Telegram Polling Error:', error);
+});
+
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  const welcomeText = `*SASUKE PRIVATE BOT v6.0*
-
-Welcome! Use /pair <whatsapp_number> to link your WhatsApp.
-Example: /pair 2348089281494`;
-  bot.sendMessage(chatId, welcomeText, { parse_mode: 'Markdown' });
+  const welcomeText = "SASUKE PRIVATE BOT v6.0\n\nWelcome! Use /pair [number] to link your WhatsApp.\nExample: /pair 2348089281494";
+  bot.sendMessage(chatId, welcomeText);
 });
 
 bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
@@ -24,7 +25,7 @@ bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
   try {
     startpairing(phoneNumber, async (result) => {
       if (result.success) {
-        await bot.sendMessage(chatId, `✅ *Pairing Code Generated!*\n\nCode: \`${result.code}\`\n\nLink your WhatsApp within 60 seconds.`, { parse_mode: 'Markdown' });
+        await bot.sendMessage(chatId, `✅ Pairing Code Generated!\n\nCode: ${result.code}\n\nLink your WhatsApp within 60 seconds.`);
       } else {
         await bot.sendMessage(chatId, `❌ Pairing failed: ${result.error || 'Unknown error'}`);
       }
