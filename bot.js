@@ -2,78 +2,92 @@ const TelegramBot = require('node-telegram-bot-api');
 const config = require('./config.js');
 const { startpairing } = require('./pair.js');
 
+if (!config.TELEGRAM_BOT_TOKEN) {
+  console.error('CRITICAL: TELEGRAM_BOT_TOKEN is missing in config.js or environment!');
+}
+
 const bot = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true });
 
 const WELCOME_IMAGE = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663880460655/oBHbHdgBaZHRJbmc.png";
 
-console.log('🤖 Sasuke Private Bot Telegram wrapper started with visual assets...');
+console.log('🤖 Sasuke Private Bot Telegram wrapper initialized and polling...');
 
 bot.on('polling_error', (error) => {
-  console.error('Telegram Polling Error:', error);
+  console.error('Telegram Polling Error code:', error.code, error.message);
 });
 
-bot.onText(/\/start/, (msg) => {
+bot.on('error', (error) => {
+  console.error('Telegram General Error:', error);
+});
+
+bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   const caption = 
-    "╭ ⟨ *𝗦𝗔𝗦𝗨𝗞𝗘 𝗣𝗥𝗜𝗩𝗔𝗧𝗘 𝗕𝗢𝗧* ◖ ᴠ𝟲.0 ◗ ⟩ ✦\n" +
-    "│ ⎋ ꜱʏꜱᴛᴇᴍ : ᴋᴏɴᴏʜᴀ_ᴄᴏʀᴇ\n" +
-    "├────────────⬣\n" +
-    "│ ❂ *𝗪𝗘𝗟𝗖𝗢𝗠𝗘, 𝗦𝗛𝗢𝗕𝗨𝗡𝗦𝗛𝗜*\n" +
-    "│ ⟡ Link your WhatsApp session below.\n" +
-    "├────────────⬣\n" +
-    "│ ⚡ *𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦*\n" +
-    "│  ▸ `/pair <whatsapp_number>`\n" +
-    "│  ▸ `/help` · `/ping`\n" +
-    "╰────────────⬣\n\n" +
-    "_Example: `/pair 2348089281494`_";
+    "SASUKE PRIVATE BOT v6.0\n\n" +
+    "Welcome, Shobunshi! Konoha Core is active.\n\n" +
+    "Commands:\n" +
+    "• /pair <whatsapp_number>\n" +
+    "• /help\n" +
+    "• /ping\n\n" +
+    "Example: /pair 2348089281494";
 
-  bot.sendPhoto(chatId, WELCOME_IMAGE, {
-    caption: caption,
-    parse_mode: 'Markdown'
-  }).catch((err) => {
-    console.error('Failed to send photo, falling back to text:', err.message);
-    bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
-  });
+  try {
+    await bot.sendPhoto(chatId, WELCOME_IMAGE, {
+      caption: caption
+    });
+  } catch (err) {
+    console.error('Failed to send photo, sending text:', err.message);
+    await bot.sendMessage(chatId, caption);
+  }
+});
+
+bot.onText(/\/ping/, async (msg) => {
+  await bot.sendMessage(msg.chat.id, "Pong! Konoha Core is online and stable ⚡");
 });
 
 bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const phoneNumber = match[1].trim();
 
-  console.log(`⏳ Pairing request for ${phoneNumber} from ${chatId}`);
+  console.log(`⏳ Received pairing request for ${phoneNumber} from chat ${chatId}`);
 
-  const statusMsg = await bot.sendMessage(chatId, "⚡ *Konoha Core* initiating pairing sequence...", { parse_mode: 'Markdown' });
+  const statusMsg = await bot.sendMessage(chatId, "Initiating Konoha pairing sequence...");
+
+  let replied = false;
 
   try {
     startpairing(phoneNumber, async (result) => {
+      if (replied) return;
+      replied = true;
+
       if (result.success) {
         const pairingText = 
-          "╭ ⟨ *𝗣𝗔𝗜𝗥𝗜𝗡𝗚 𝗦𝗨𝗖𝗖𝗘𝗦𝗦𝗙𝗨𝗟* ◗ ⟩ ✦\n" +
-          "├────────────⬣\n" +
-          "│ 🔑 *Code:* `" + result.code + "`\n" +
-          "│ ⏳ *Expires:* `60 seconds`\n" +
-          "├────────────⬣\n" +
-          "│ _Enter this code in WhatsApp -> Linked Devices -> Link with phone number._\n" +
-          "╰────────────⬣";
+          "PAIRING SUCCESSFUL\n\n" +
+          "Code: " + result.code + "\n\n" +
+          "Enter this code in WhatsApp -> Linked Devices -> Link with phone number.";
         
         await bot.editMessageText(pairingText, {
           chat_id: chatId,
-          message_id: statusMsg.message_id,
-          parse_mode: 'Markdown'
+          message_id: statusMsg.message_id
         });
       } else {
-        await bot.editMessageText(`❌ *Pairing Failed*\n\nReason: \`${result.error || 'Unknown error'}\``, {
-          chat_id: chatId,
-          message_id: statusMsg.message_id,
-          parse_mode: 'Markdown'
-        });
+        await bot.editMessageText("Pairing Failed\n\nReason: " + (result.error || 'Unknown error'));
       }
     });
+
+    // Safety timeout in case pairing callback takes too long
+    setTimeout(async () => {
+      if (!replied) {
+        replied = true;
+        await bot.editMessageText(chatId, statusMsg.message_id, "Pairing request timed out or code generated. Check bot console.").catch(() => {});
+      }
+    }, 25000);
+
   } catch (e) {
-    await bot.editMessageText(`❌ *Error*\n\n\`${e.message}\``, {
+    console.error('Pairing command execution error:', e);
+    await bot.editMessageText(`Error: ${e.message}`, {
       chat_id: chatId,
-      message_id: statusMsg.message_id,
-      parse_mode: 'Markdown'
-    });
+      message_id: statusMsg.message_id
+    }).catch(() => {});
   }
 });
