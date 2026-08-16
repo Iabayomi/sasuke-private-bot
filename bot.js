@@ -4,22 +4,36 @@ const { startpairing } = require('./pair.js');
 
 const bot = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true });
 
-console.log('🤖 Sasuke Private Bot Telegram wrapper started...');
+const WELCOME_IMAGE = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663880460655/oBHbHdgBaZHRJbmc.png";
+
+console.log('🤖 Sasuke Private Bot Telegram wrapper started with visual assets...');
 
 bot.on('polling_error', (error) => {
   console.error('Telegram Polling Error:', error);
 });
 
-bot.on('message', (msg) => {
-  console.log(`📩 Received message from ${msg.chat.id}: ${msg.text}`);
-});
-
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  const welcomeText = "Welcome to Sasuke Private Bot!\n\nUse /pair [number] to link your WhatsApp.\nExample: /pair 2348089281494";
-  bot.sendMessage(chatId, welcomeText)
-    .then(() => console.log(`✅ Sent welcome to ${chatId}`))
-    .catch((err) => console.error(`❌ Failed to send welcome to ${chatId}:`, err.message));
+  const caption = 
+    "╭ ⟨ *𝗦𝗔𝗦𝗨𝗞𝗘 𝗣𝗥𝗜𝗩𝗔𝗧𝗘 𝗕𝗢𝗧* ◖ ᴠ𝟲.0 ◗ ⟩ ✦\n" +
+    "│ ⎋ ꜱʏꜱᴛᴇᴍ : ᴋᴏɴᴏʜᴀ_ᴄᴏʀᴇ\n" +
+    "├────────────⬣\n" +
+    "│ ❂ *𝗪𝗘𝗟𝗖𝗢𝗠𝗘, 𝗦𝗛𝗢𝗕𝗨𝗡𝗦𝗛𝗜*\n" +
+    "│ ⟡ Link your WhatsApp session below.\n" +
+    "├────────────⬣\n" +
+    "│ ⚡ *𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦*\n" +
+    "│  ▸ `/pair <whatsapp_number>`\n" +
+    "│  ▸ `/help` · `/ping`\n" +
+    "╰────────────⬣\n\n" +
+    "_Example: `/pair 2348089281494`_";
+
+  bot.sendPhoto(chatId, WELCOME_IMAGE, {
+    caption: caption,
+    parse_mode: 'Markdown'
+  }).catch((err) => {
+    console.error('Failed to send photo, falling back to text:', err.message);
+    bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+  });
 });
 
 bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
@@ -28,22 +42,38 @@ bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
 
   console.log(`⏳ Pairing request for ${phoneNumber} from ${chatId}`);
 
-  bot.sendMessage(chatId, `⏳ Generating pairing code for ${phoneNumber}...`)
-    .catch((err) => console.error(`❌ Failed to send status to ${chatId}:`, err.message));
+  const statusMsg = await bot.sendMessage(chatId, "⚡ *Konoha Core* initiating pairing sequence...", { parse_mode: 'Markdown' });
 
   try {
     startpairing(phoneNumber, async (result) => {
       if (result.success) {
-        bot.sendMessage(chatId, `✅ Pairing Code Generated!\n\nCode: ${result.code}\n\nLink your WhatsApp within 60 seconds.`)
-          .then(() => console.log(`✅ Sent code to ${chatId}`))
-          .catch((err) => console.error(`❌ Failed to send code to ${chatId}:`, err.message));
+        const pairingText = 
+          "╭ ⟨ *𝗣𝗔𝗜𝗥𝗜𝗡𝗚 𝗦𝗨𝗖𝗖𝗘𝗦𝗦𝗙𝗨𝗟* ◗ ⟩ ✦\n" +
+          "├────────────⬣\n" +
+          "│ 🔑 *Code:* `" + result.code + "`\n" +
+          "│ ⏳ *Expires:* `60 seconds`\n" +
+          "├────────────⬣\n" +
+          "│ _Enter this code in WhatsApp -> Linked Devices -> Link with phone number._\n" +
+          "╰────────────⬣";
+        
+        await bot.editMessageText(pairingText, {
+          chat_id: chatId,
+          message_id: statusMsg.message_id,
+          parse_mode: 'Markdown'
+        });
       } else {
-        bot.sendMessage(chatId, `❌ Pairing failed: ${result.error || 'Unknown error'}`)
-          .catch((err) => console.error(`❌ Failed to send error to ${chatId}:`, err.message));
+        await bot.editMessageText(`❌ *Pairing Failed*\n\nReason: \`${result.error || 'Unknown error'}\``, {
+          chat_id: chatId,
+          message_id: statusMsg.message_id,
+          parse_mode: 'Markdown'
+        });
       }
     });
   } catch (e) {
-    bot.sendMessage(chatId, `❌ Error: ${e.message}`)
-      .catch((err) => console.error(`❌ Failed to send catch error to ${chatId}:`, err.message));
+    await bot.editMessageText(`❌ *Error*\n\n\`${e.message}\``, {
+      chat_id: chatId,
+      message_id: statusMsg.message_id,
+      parse_mode: 'Markdown'
+    });
   }
 });
