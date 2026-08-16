@@ -8,12 +8,10 @@ console.log('🤖 Sasuke Private Bot Telegram wrapper started...');
 
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  const welcomeText = `╭ ⟨ *𝗦𝗔𝗦𝗨𝗞𝗘 𝗣𝗥𝗜V𝗔𝗧𝗘 𝗕𝗢𝗧* ◗ ⟩ ✦
-│ ⎋ ꜱʏꜱᴛᴇᴍ : ᴋᴏɴᴏʜᴀ_ᴄᴏʀᴇ ᴠ𝟲.𝟬
-├────────────⬣
-│ 🍃 Use \`/pair <whatsapp_number>\` to link your WhatsApp.
-│ Example: \`/pair 2348089281494\`
-╰───────────────────────────⬣`;
+  const welcomeText = `*SASUKE PRIVATE BOT v6.0*
+
+Welcome! Use /pair <whatsapp_number> to link your WhatsApp.
+Example: /pair 2348089281494`;
   bot.sendMessage(chatId, welcomeText, { parse_mode: 'Markdown' });
 });
 
@@ -21,7 +19,7 @@ bot.onText(/\/pair\s+(.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const phoneNumber = match[1].trim();
 
-  await bot.sendMessage(chatId, `⏳ Generating pairing code for *${phoneNumber}*...`, { parse_mode: 'Markdown' });
+  await bot.sendMessage(chatId, `⏳ Generating pairing code for ${phoneNumber}...`);
 
   try {
     startpairing(phoneNumber, async (result) => {
